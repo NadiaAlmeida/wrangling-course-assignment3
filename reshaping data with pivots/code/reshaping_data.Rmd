@@ -197,7 +197,24 @@ Wrangle the demographics data included in this exercise more efficiently by resh
 
 dat<- read_csv("../data/raw/data_demographics_raw.csv")
 
-
+selected_dat <- dat |>
+  rename(id = subject, item = trialcode) |>
+  select(id, item, response) |>
+  pivot_wider(names_from = item,
+              values_from = response) %>%
+  mutate(gender = str_remove_all(gender, "[\\d.]"),
+         gender = na_if(gender, ""), 
+         gender = case_when(gender == "woman" ~ "female",
+                            gender == "yes" ~ NA_character_,
+                            gender == "man" ~ "male",
+                            gender == "girl" ~ "female",
+                            gender == "dude" ~ "male",
+                            gender == "non binary" ~ "non-binary",
+                            TRUE ~ gender)) |>
+  mutate(age = str_remove_all(age, "[^\\d.]"),
+         age = na_if(age, ""),
+         age = as.numeric(age))
+  
 ```
 
 # Session info
